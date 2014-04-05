@@ -19,8 +19,20 @@
 		<smtpEventHandler_solution>.\build\smtpEventHandler.sln</smtpEventHandler_solution>
 		<xd_solution>.\build\xd.sln</xd_solution>
 		<configui_solution>.\admin\AdminUI.sln</configui_solution>
+		<!-- need to place this here to get around some sticky quote issues -->
+		<PsGlobalAssemblyInfo>powershell -Command "(Get-Content .\GlobalAssemblyInfo.cs) | Foreach-Object {$_ -replace '\d+\.\d+\.\d+\.\d+', '$(Version)'} | Set-Content .\GlobalAssemblyInfo.cs"</PsGlobalAssemblyInfo>
+		<PsInstallerFile>powershell -Command "(Get-Content .installer\Direct.iss) | Foreach-Object {$_ -replace '\d+\.\d+\.\d+\.\d+', '$(Version)'} | Set-Content .\Direct.iss"</PsInstallerFile>
+		<PsListTargets>powershell -Command "$build = [xml](Get-Content $(MSBuildProjectFile)); $build.Project.Target| Select-Object Name | Sort-Object Name "</PsListTargets>
 	</PropertyGroup>
 
+	<Target Name="Targets">
+		<Exec Command='$(PsListTargets)' />
+	</Target>
+	
+	<Target Name="update-version-info">
+		<Exec Command='$(PsGlobalAssemblyInfo)' />
+	</Target>
+	
 	<!-- Aliases -->
 	<Target Name="build" DependsOnTargets="build-all" />
 	<Target Name="build-all" DependsOnTargets="build-agent;build-gateway;build-xd;build-configui" />
@@ -30,6 +42,7 @@
 
 	<Target Name="test" DependsOnTargets="test-all" />
 	<Target Name="test-all" DependsOnTargets="test-agent;test-gateway;test-xd" />
+
 
 	<Target Name="build-agent">
 		<MSBuild Projects="$(agent_solution)" Targets="build" Properties="Configuration=$(Configuration)" />
