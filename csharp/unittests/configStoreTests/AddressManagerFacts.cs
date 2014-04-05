@@ -274,7 +274,6 @@ namespace Health.Direct.Config.Store.Tests
             InitAddressRecords();
             using (ConfigDatabase db = CreateConfigDatabase())
             {
-                InitAddressRecords();
                 AddressManager mgr = CreateManager();
                 string domainName = BuildDomainName(1);
                 Address[] addrs = mgr.GetAllForDomain(db

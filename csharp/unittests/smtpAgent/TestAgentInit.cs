@@ -17,6 +17,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Xml;
+using System.Xml.Serialization;
 using Xunit;
 using Xunit.Extensions;
 using Health.Direct.Common.Container;
@@ -72,6 +74,22 @@ namespace Health.Direct.SmtpAgent.Tests
             IAuditor auditor = null;
             Assert.DoesNotThrow(() => auditor = IoC.Resolve<IAuditor>());
             Assert.True(auditor is DummyAuditor);
+        }
+
+        [Fact]
+        public void TestAddressDomainEnabled_Settings()
+        {
+            SmtpAgentSettings settings = null;
+            Assert.DoesNotThrow(() => settings = SmtpAgentSettings.LoadSettings(Fullpath("TestSmtpAgentConfigService.xml")));
+
+            Assert.True(settings.AddressManager.HasSettings);
+            using (XmlNodeReader reader = new XmlNodeReader(settings.AddressManager.Settings))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(AddressManagerSettings), new XmlRootAttribute(settings.AddressManager.Settings.LocalName));
+                AddressManagerSettings addressManagerSettings = (AddressManagerSettings)serializer.Deserialize(reader);
+                Assert.NotNull(addressManagerSettings);
+                Assert.True(addressManagerSettings.EnableDomainSearch);
+            }
         }
 
         //

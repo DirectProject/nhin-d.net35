@@ -56,20 +56,8 @@ namespace Health.Direct.SmtpAgent.Tests
             Assert.Throws<OutgoingAgentException>(() => m_agent.ProcessMessage(this.LoadMessage(BadMessage)));
         }
         
-        [Fact]
-        public void TestAddressDomainEnabled_Settings()
-        {
-            SmtpAgent agent = SmtpAgentFactory.Create(GetSettingsPath("TestSmtpAgentConfigService.xml"));
-            Assert.True(agent.Settings.AddressManager.HasSettings);
-            using (XmlNodeReader reader = new XmlNodeReader(agent.Settings.AddressManager.Settings))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(AddressManagerSettings), new XmlRootAttribute(agent.Settings.AddressManager.Settings.LocalName));
-                AddressManagerSettings addressManagerSettings = (AddressManagerSettings)serializer.Deserialize(reader);
-                Assert.NotNull(addressManagerSettings);
-                Assert.True(addressManagerSettings.EnableDomainSearch);
-            }
 
-        }
+
 
         [Fact]
         public void TestEndToEnd()
