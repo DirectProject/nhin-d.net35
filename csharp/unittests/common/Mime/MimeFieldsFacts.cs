@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Net.Mime;
 using System.Net.Mail;
+using Health.Direct.Common.Extensions;
 using Health.Direct.Common.Mime;
 using Health.Direct.Common.BlueButton;
 using Xunit;
