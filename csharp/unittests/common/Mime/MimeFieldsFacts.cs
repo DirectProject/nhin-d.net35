@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Net.Mime;
@@ -41,14 +42,14 @@ namespace Health.Direct.Common.Tests.Mime
                     },
                     3
                 };
-                
+
                 ContentType c = new ContentType("message/partial");
                 c.Name = "Bingo";
                 c.Parameters["id"] = "28a3sesd313@xyx.pqr";
                 c.Parameters["number"] = "1";
                 c.Parameters["quoted"] = "(foo<bar?q";
                 c.Parameters["total"] = "3";
-                yield return new object[] {c, 6};
+                yield return new object[] { c, 6 };
             }
         }
 
@@ -89,32 +90,39 @@ namespace Health.Direct.Common.Tests.Mime
                 };
             }
         }
-                
+
         [Theory]
         [PropertyData("ContentTypes")]
         public void TestContentType(ContentType contentType, int paramCount)
         {
             string fieldText = contentType.ToString();
-            
+
             MimeFieldParameters fieldParams = new MimeFieldParameters();
             Assert.DoesNotThrow(() => fieldParams.Deserialize(fieldText));
             Assert.True(fieldParams.Count == paramCount);
-            
+
             Assert.Equal(contentType.MediaType, fieldParams[0].Value);
             Assert.Equal<string>(contentType.Name, fieldParams["name"]);
-            
+
             Assert.DoesNotThrow(() => Compare(fieldParams, contentType.Parameters));
-            
+
             string fieldTextSerialized = null;
             Assert.DoesNotThrow(() => fieldTextSerialized = fieldParams.Serialize());
-            
+
             fieldParams.Clear();
             Assert.DoesNotThrow(() => fieldParams.Deserialize(fieldTextSerialized));
             Assert.True(fieldParams.Count == paramCount);
-            
-            Assert.DoesNotThrow(() => new ContentType(fieldTextSerialized));            
+
+            Assert.DoesNotThrow(() => new ContentType(fieldTextSerialized));
         }
-        
+
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="disposition"></param>
+        /// <param name="paramCount"></param>
         [Theory]
         [PropertyData("ContentDispositions")]
         public void TestDisposition(ContentDisposition disposition, int paramCount)
@@ -127,16 +135,16 @@ namespace Health.Direct.Common.Tests.Mime
 
             Assert.Equal(disposition.DispositionType, fieldParams[0].Value);
             Assert.Equal(disposition.FileName, fieldParams["filename"]);
-            
+
             Assert.DoesNotThrow(() => Compare(fieldParams, disposition.Parameters));
-            
+
             string fieldTextSerialized = null;
             Assert.DoesNotThrow(() => fieldTextSerialized = fieldParams.Serialize());
 
             fieldParams.Clear();
             Assert.DoesNotThrow(() => fieldParams.Deserialize(fieldTextSerialized));
             Assert.True(fieldParams.Count == paramCount);
-
+            Console.WriteLine(fieldTextSerialized);
             Assert.DoesNotThrow(() => new ContentDisposition(fieldTextSerialized));
         }
 
@@ -160,18 +168,18 @@ namespace Health.Direct.Common.Tests.Mime
                 yield return new KeyValuePair<string, MailAddress>("emailDoc3", new MailAddress("<frank.hardy@direct.healthvault.com>"));
             }
         }
-                
+
         [Fact]
         public void TestBlueBluttonSerialization()
-        {            
+        {
             RequestContext context = this.CreateContext();
-            
+
             MimeEntity entity = null;
             Assert.DoesNotThrow(() => entity = context.ToMimeEntity());
-            
-            string entityText = null;            
+
+            string entityText = null;
             Assert.DoesNotThrow(() => entityText = entity.ToString());
-            
+
             MimeEntity parsedEntity = null;
             Assert.DoesNotThrow(() => parsedEntity = MimeSerializer.Default.Deserialize<MimeEntity>(entityText));
 
@@ -179,37 +187,38 @@ namespace Health.Direct.Common.Tests.Mime
             Assert.DoesNotThrow(() => attachment = context.ToAttachment());
             Assert.True(attachment.ContentType.MediaType == MediaTypeNames.Text.Plain);
             Assert.True(attachment.ContentDisposition.FileName == RequestContext.AttachmentName);
-            
+
             string attachmentBody = attachment.StringContent();
             Assert.True(attachmentBody.Contains(RequestContext.FieldNames.DocumentSource));
-            
+
             RequestContext contextParsed = new RequestContext(parsedEntity.Body.Text);
             this.Compare(context.GetDocumentSources(), contextParsed.GetDocumentSources());
         }
-        
-        [Fact]        
+
+        [Fact]
         public void TestBlueButtonSources()
         {
             RequestContext context = this.CreateContext();
             List<DocumentSource> ds = null;
-            
+
             Assert.DoesNotThrow(() => ds = context.GetDocumentSources().ToList());
 
-            List<DocumentSource> matches = null;            
-            Assert.DoesNotThrow(() => {
+            List<DocumentSource> matches = null;
+            Assert.DoesNotThrow(() =>
+            {
                 matches = (
                 from doc in ds
                 where doc.IsSourceForDocument("emailDoc")
                 select doc
                 ).ToList();
-            });    
+            });
             Assert.True(matches.Count == 2);
-            
-            int matchCount = matches.Count;                    
+
+            int matchCount = matches.Count;
             Assert.DoesNotThrow(() => context.RemoveDocumentSources());
-            Assert.True(context.Count == (matchCount -2));
+            Assert.True(context.Count == (matchCount - 2));
         }
-        
+
         RequestContext CreateContext()
         {
             RequestContext context = new RequestContext();
@@ -217,40 +226,40 @@ namespace Health.Direct.Common.Tests.Mime
             this.AddMailSources(context);
             return context;
         }
-        
+
         void AddTextSources(RequestContext context)
-        {        
-            foreach(KeyValuePair<string, string> kv in DocumentSourcesText)
+        {
+            foreach (KeyValuePair<string, string> kv in DocumentSourcesText)
             {
                 Assert.DoesNotThrow(() => context.Add(new DocumentSource(kv.Key, kv.Value)));
             }
-        } 
+        }
 
         void AddMailSources(RequestContext context)
-        {    
+        {
             foreach (KeyValuePair<string, MailAddress> kv in DocumentSourcesMailAddress)
             {
                 Assert.DoesNotThrow(() => context.Add(new DocumentSource(kv.Key, kv.Value)));
             }
         }
-        
+
         void Compare(MimeFieldParameters mfp, StringDictionary pd)
-        {   
-            foreach(string key in pd.Keys)
+        {
+            foreach (string key in pd.Keys)
             {
                 Assert.Equal(pd[key], mfp[key]);
             }
-        } 
-        
+        }
+
         void Compare(IEnumerable<DocumentSource> x, IEnumerable<DocumentSource> y)
         {
             List<DocumentSource> xl = null;
             List<DocumentSource> yl = null;
-            
+
             Assert.DoesNotThrow(() => xl = x.ToList());
             Assert.DoesNotThrow(() => yl = y.ToList());
             Assert.True(xl.Count == yl.Count);
-            
+
             for (int i = 0, count = xl.Count; i < count; ++i)
             {
                 Assert.True(xl[i].CompareTo(yl[i]) == 0);
