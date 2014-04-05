@@ -263,8 +263,8 @@ namespace Health.Direct.Common.Mime
             }
             DateTime dateValue;
             // Fix the following format up to be RFC5322 date-time compliant: RFC5322 3.3.
-            // Notice Hour must be two digits.
-            if (DateTime.TryParseExact(param.Value, new[] { "ddd, dd MMM yyyy H:mm:ss zzz" }, CultureInfo.InvariantCulture,
+            // Hour must be two digits.  Found this issue in build servers.
+            if (DateTime.TryParse(param.Value, CultureInfo.InvariantCulture,
                 DateTimeStyles.AllowWhiteSpaces, out dateValue))
             {
                 KeyValuePair<string, string> paramFormatted
