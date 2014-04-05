@@ -15,6 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace Health.Direct.Config.Store.Tests
 {
     public class MultiThreadTests : ConfigStoreTestBase
     {
-        public const string ConnectionStringTimeout = @"Data Source=.\SQLEXPRESS;Initial Catalog=DirectConfig;Integrated Security=SSPI;Connection Timeout=120";
+        private static string ConnectionStringTimeout;
         static ConfigStore s_store;
         const string TestDomain = "unittests.com";
         
@@ -35,6 +36,7 @@ namespace Health.Direct.Config.Store.Tests
         
         static MultiThreadTests()
         {
+            ConnectionStringTimeout = ConfigurationManager.AppSettings["connectionStringTimeout"];
             s_store = new ConfigStore(ConnectionStringTimeout, TimeSpan.FromMinutes(2));
         }
         
