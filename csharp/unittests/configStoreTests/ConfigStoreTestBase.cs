@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.IO;
 using Health.Direct.Common.Certificates;
@@ -27,7 +28,7 @@ namespace Health.Direct.Config.Store.Tests
 {
     public class ConfigStoreTestBase
     {
-        private const string ConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=DirectConfig;Integrated Security=SSPI;";
+        private static string ConnectionString; 
 
         protected const int MAXDOMAINCOUNT = 10; //---number should be <= .cer file count in metadata folder
         protected const int MAXSMTPCOUNT = 3;
@@ -81,6 +82,7 @@ namespace Health.Direct.Config.Store.Tests
         /// <param name="dumpEnabled"><c>true</c> if dump output will be display</param>
         protected ConfigStoreTestBase(bool dumpEnabled)
         {
+            ConnectionString = ConfigurationManager.AppSettings["connectionString"];
             m_dumpEnabled = dumpEnabled;
         }
 

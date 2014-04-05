@@ -157,4 +157,10 @@
 		<Error Text="Use the build-installer.bat script found in the installer directory." />
 	</Target>
 	
+	
+	<Target Name="config-store-buildserver">
+		<Delete Files="unittests\configStoreTests\app.config" ContinueOnError="false"></Delete>
+		<Copy SourceFiles="unittests\configStoreTests\tc.app.config" DestinationFiles="unittests\configStoreTests\app.config"></Copy>
+	</Target>
+	
 </Project>
