@@ -15,9 +15,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Health.Direct.Common.Extensions;
 using Health.Direct.Common.Mail;
 
 namespace Health.Direct.Common.Mime
@@ -32,17 +34,17 @@ namespace Health.Direct.Common.Mime
     /// This very simple parser is very forgiving. 
     /// </summary>
     public class MimeFieldParameters : List<KeyValuePair<string, string>>
-    {   
+    {
         const char ParameterSeparator = ';';
         const char NameValueSeparator = '=';
-        
+
         /// <summary>
         /// Construct an empty field parameters collection
         /// </summary>
         public MimeFieldParameters()
         {
         }
-        
+
         /// <summary>
         /// Initialize a field parameters collection with the given params
         /// </summary>
@@ -51,7 +53,7 @@ namespace Health.Direct.Common.Mime
             : base(fieldParams)
         {
         }
-        
+
         /// <summary>
         /// Parse the given field value into this field parameters collection
         /// </summary>
@@ -60,7 +62,7 @@ namespace Health.Direct.Common.Mime
             : this(Read(fieldValue))
         {
         }
-        
+
         /// <summary>
         /// Returns the value for the first parameter with the given name
         /// </summary>
@@ -72,14 +74,14 @@ namespace Health.Direct.Common.Mime
             {
                 int index = this.IndexOfFirst(paramName);
                 if (index < 0)
-                { 
+                {
                     return null;
                 }
-                
+
                 return this[index].Value;
             }
         }
-        
+
         /// <summary>
         /// Deserialize the given field value into this collection
         /// </summary>
@@ -88,7 +90,7 @@ namespace Health.Direct.Common.Mime
         {
             this.AddRange(Read(fieldValue));
         }
-        
+
         /// <summary>
         /// Returns all values for the given paramName
         /// </summary>
@@ -102,7 +104,7 @@ namespace Health.Direct.Common.Mime
                 select nv.Value
             );
         }
-        
+
         /// <summary>
         /// Returns the index of the first parameter with this name
         /// </summary>
@@ -121,10 +123,10 @@ namespace Health.Direct.Common.Mime
                     return i;
                 }
             }
-            
+
             return -1;
         }
-        
+
         /// <summary>
         /// Serialize parameters to a string
         /// </summary>
@@ -133,7 +135,7 @@ namespace Health.Direct.Common.Mime
         {
             return this.Serialize(false);
         }
-        
+
         /// <summary>
         /// Serialize parameters to a string
         /// </summary>
@@ -145,16 +147,16 @@ namespace Health.Direct.Common.Mime
             Write(output, this, alwaysQuoteValues);
             return output.ToString();
         }
-        
+
         /// <summary>
         /// Serialize parameters to a string
         /// </summary>
         /// <returns></returns>
         public override string ToString()
-        {   
+        {
             return this.Serialize();
-        }   
-        
+        }
+
         /// <summary>
         /// See RFC 5322, Section 3.2.3
         /// </summary>
@@ -162,11 +164,11 @@ namespace Health.Direct.Common.Mime
         /// <returns></returns>
         public static bool IsSpecialChar(char ch)
         {
-            switch(ch)
+            switch (ch)
             {
                 default:
                     return false;
-                
+
                 case '(':
                 case ')':
                 case '<':
@@ -182,26 +184,26 @@ namespace Health.Direct.Common.Mime
                     return true;
             }
         }
-        
+
         /// <summary>
         /// Write field paramters to an output buffer
         /// </summary>
         /// <param name="output"></param>
         /// <param name="fieldParams"></param>
         /// <param name="alwaysQuoteValues"></param>
-        public static void Write(StringBuilder output, IEnumerable<KeyValuePair<string, string>> fieldParams, bool alwaysQuoteValues)        
+        public static void Write(StringBuilder output, IEnumerable<KeyValuePair<string, string>> fieldParams, bool alwaysQuoteValues)
         {
             if (fieldParams == null)
             {
                 throw new ArgumentNullException("paramSet");
             }
-            
-            foreach(KeyValuePair<string, string> param in fieldParams)
+
+            foreach (KeyValuePair<string, string> param in fieldParams)
             {
                 Write(output, param, alwaysQuoteValues);
             }
         }
-        
+
         /// <summary>
         /// Write the next field parameter to an output buffer
         /// </summary>
@@ -214,7 +216,7 @@ namespace Health.Direct.Common.Mime
             {
                 throw new ArgumentNullException("output");
             }
-            
+
             if (output.Length > 0)
             {
                 output.Append(MimeFieldParameters.ParameterSeparator);
@@ -222,13 +224,15 @@ namespace Health.Direct.Common.Mime
             if (!string.IsNullOrEmpty(param.Key))
             {
                 output.Append(param.Key);
-                output.Append(MimeFieldParameters.NameValueSeparator);            
+                output.Append(MimeFieldParameters.NameValueSeparator);
             }
             if (string.IsNullOrEmpty(param.Value))
             {
                 return;
             }
-            
+
+            param = EnsureSmtpDateTime(param);
+
             bool needsQuotes = (alwaysQuoteValue || ContainsSpecialChars(param.Value));
             if (needsQuotes)
             {
@@ -241,20 +245,50 @@ namespace Health.Direct.Common.Mime
                 output.Append(MailStandard.DQUOTE);
             }
         }
-        
+
+
+        static readonly string[] dateKeys = new[]
+        {
+              "modification-date"
+            , "read-date"
+            , "creation-date"
+        };
+
+
+        static KeyValuePair<string, string> EnsureSmtpDateTime(KeyValuePair<string, string> param)
+        {
+            if (!dateKeys.Contains(param.Key))
+            {
+                return param;
+            }
+            DateTime dateValue;
+            // Fix the following format up to be RFC5322 date-time compliant: RFC5322 3.3.
+            // Notice Hour must be two digits.
+            if (DateTime.TryParseExact(param.Value, new[] { "ddd, dd MMM yyyy H:mm:ss zzz" }, CultureInfo.InvariantCulture,
+                DateTimeStyles.AllowWhiteSpaces, out dateValue))
+            {
+                KeyValuePair<string, string> paramFormatted
+                    = new KeyValuePair<string, string>(
+                        param.Key
+                        , dateValue.ToRFC822String());
+                return paramFormatted;
+            }
+            return param;
+        }
+
         /// <summary>
         /// Read field parameters from the given field value
         /// </summary>
         /// <param name="fieldValue"></param>
         /// <returns></returns>
-        public static IEnumerable<KeyValuePair<string,string>> Read(string fieldValue)
+        public static IEnumerable<KeyValuePair<string, string>> Read(string fieldValue)
         {
-            foreach(StringSegment parameter in StringSegment.Split(fieldValue, MimeFieldParameters.ParameterSeparator, MailStandard.DQUOTE))
+            foreach (StringSegment parameter in StringSegment.Split(fieldValue, MimeFieldParameters.ParameterSeparator, MailStandard.DQUOTE))
             {
-                yield return ReadNameValue(parameter);      
+                yield return ReadNameValue(parameter);
             }
         }
-        
+
         /// <summary>
         /// Read name value parameters from the given segment
         /// </summary>
@@ -263,25 +297,25 @@ namespace Health.Direct.Common.Mime
         public static KeyValuePair<string, string> ReadNameValue(StringSegment parameterText)
         {
             CharReader reader = new CharReader(parameterText); // Struct. Cheap  
-                        int nameStartAt = parameterText.StartIndex;
+            int nameStartAt = parameterText.StartIndex;
             string name;
             string value;
             if (!reader.ReadTo(MimeFieldParameters.NameValueSeparator, true))
             {
                 // We ran out of segment. Treat the entire segment as a value with no name
                 value = reader.Substring(nameStartAt, reader.Position);
-                return new KeyValuePair<string,string>(string.Empty, value);
+                return new KeyValuePair<string, string>(string.Empty, value);
             }
             name = reader.Substring(nameStartAt, reader.Position - 1);
             if (string.IsNullOrEmpty(name))
             {
                 throw new MimeException(MimeError.InvalidFieldParameter);
-            }            
+            }
             value = ReadValue(ref reader);
-            
-            return new KeyValuePair<string,string>(name.TrimStart(), value);
+
+            return new KeyValuePair<string, string>(name.TrimStart(), value);
         }
-                        
+
         static string ReadValue(ref CharReader reader)
         {
             int startAt = reader.Position + 1;
@@ -304,7 +338,7 @@ namespace Health.Direct.Common.Mime
             }
             return UnescapeQuotes(value);
         }
-        
+
         static bool ContainsSpecialChars(string segment)
         {
             if (segment == null)
@@ -320,7 +354,7 @@ namespace Health.Direct.Common.Mime
             }
             return false;
         }
-                
+
         static string EscapeQuotes(string value)
         {
             return value.Replace("\"", "\\\"");

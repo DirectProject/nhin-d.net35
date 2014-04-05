@@ -111,6 +111,7 @@
     <Compile Include="Mime\HeaderCollectionFacts.cs" />
     <Compile Include="Mime\HeaderFacts.cs" />
     <Compile Include="Mime\MimeEntityFacts.cs" />
+    <Compile Include="Mime\MimeFieldsFacts.cs" />
     <Compile Include="Mime\MimeParserFacts.cs" />
     <Compile Include="Mime\MimeSerializerFacts.cs" />
     <Compile Include="Mime\MimeWriterFacts.cs" />
