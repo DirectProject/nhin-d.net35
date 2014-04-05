@@ -51,20 +51,38 @@ namespace Health.Direct.Common.Tests.Mime
                 yield return new object[] {c, 6};
             }
         }
-        
+
         public static IEnumerable<object[]> ContentDispositions
         {
             get
             {
                 DateTime now = DateTime.Now;
-                ContentDisposition cd = new ContentDisposition {
-                        DispositionType = "attachment",
-                        FileName = "goobar.txt",
-                        CreationDate = now,
-                        ReadDate = now.AddDays(5),
-                        ModificationDate = now.AddDays(3),    
-                        Size = 123456789                    
-                    };
+                ContentDisposition cd = new ContentDisposition
+                {
+                    DispositionType = "attachment",
+                    FileName = "goobar.txt",
+                    CreationDate = now,
+                    ReadDate = now.AddDays(5),
+                    ModificationDate = now.AddDays(3),
+                    Size = 123456789
+                };
+                cd.Parameters["XYZ"] = "pqr/?.<";
+                yield return new object[]
+                {
+                    cd, 7
+                };
+
+                //Ensure hour of date time is in an hour that could result in a single hour digit
+                now = new DateTime(2014, 3, 20, 1, 10, 20, DateTimeKind.Local);
+                cd = new ContentDisposition
+                {
+                    DispositionType = "attachment",
+                    FileName = "goobar.txt",
+                    CreationDate = now,
+                    ReadDate = now.AddDays(5),
+                    ModificationDate = now.AddDays(3),
+                    Size = 123456789
+                };
                 cd.Parameters["XYZ"] = "pqr/?.<";
                 yield return new object[] { 
                     cd, 7
