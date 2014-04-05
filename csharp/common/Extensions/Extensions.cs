@@ -255,7 +255,7 @@ namespace Health.Direct.Common.Extensions
         public static string ToRFC822String(this DateTime dateTime)
         {
             // Its crazy we have to do this...
-            string dateTimeString = dateTime.ToString("ddd, d MMM yyyy HH:mm:ss zzz", CultureInfo.InvariantCulture);
+            string dateTimeString = dateTime.ToString("ddd, dd MMM yyyy HH:mm:ss zzz", CultureInfo.InvariantCulture);
             string rfc822Date = dateTimeString.Remove(dateTimeString.LastIndexOf(':'), 1);
             return rfc822Date;
         }

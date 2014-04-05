@@ -14,12 +14,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  
 */
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using Health.Direct.Common.Mail;
 using Health.Direct.Common.Extensions;
 using Xunit;
@@ -29,7 +31,7 @@ namespace Health.Direct.Common.Tests.Mail
 {
     public class RFC822DateFacts
     {
-        static string[] DayNames = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        static string[] DayNames = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
         static string[] MonthNames = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
         public static IEnumerable<object[]> Dates
@@ -39,7 +41,7 @@ namespace Health.Direct.Common.Tests.Mail
                 DateTime now = DateTime.Now;
                 for (int i = 0; i < 7; ++i)
                 {
-                    yield return new object[] { now.AddDays(i)};
+                    yield return new object[] { now.AddDays(i) };
                 }
             }
         }
@@ -55,7 +57,7 @@ namespace Health.Direct.Common.Tests.Mail
                 }
             }
         }
-        
+
         [Theory]
         [PropertyData("Dates")]
         public void TestDateSerialization(DateTime now)
@@ -71,10 +73,10 @@ namespace Health.Direct.Common.Tests.Mail
         {
             string dateString = null;
             string dayName = null;
-            
+
             Assert.DoesNotThrow(() => dateString = now.ToRFC822String());
-            
-            Assert.DoesNotThrow(() => dayName = dateString.Substring(0, dateString.IndexOf(',')));   
+
+            Assert.DoesNotThrow(() => dayName = dateString.Substring(0, dateString.IndexOf(',')));
             Assert.True(RFC822DateFacts.DayNames.Contains(dayName));
         }
 
@@ -95,27 +97,55 @@ namespace Health.Direct.Common.Tests.Mail
             string dateString = null;
 
             Assert.DoesNotThrow(() => dateString = now.ToRFC822String());
-            
+            Console.WriteLine(dateString);
             int indexOfDash = -1;
             Assert.DoesNotThrow(() => indexOfDash = dateString.LastIndexOf('-'));
+            if (indexOfDash == -1)
+            {
+                indexOfDash = dateString.LastIndexOf('+');
+            }
             Assert.True(indexOfDash >= 0);
-            
-            // Verify there is no colon after the dash
+
+            // Verify there is no colon after the dash or plus
             Assert.True(dateString.IndexOf(':', indexOfDash) < 0);
         }
-        
+
+        [Theory]
+        [PropertyData("Dates")]
+        public void TestZoneUtc(DateTime now)
+        {
+            string dateString = null;
+
+            Assert.DoesNotThrow(() => dateString = now.ToUniversalTime().ToRFC822String());
+            Console.WriteLine(dateString);
+            int indexOfDash = -1;
+            Assert.DoesNotThrow(() => indexOfDash = dateString.LastIndexOf('-'));
+            if (indexOfDash == -1)
+            {
+                indexOfDash = dateString.LastIndexOf('+');
+            }
+            Assert.True(indexOfDash >= 0);
+
+            // Verify there is no colon after the dash or plus
+            Assert.True(dateString.IndexOf(':', indexOfDash) < 0);
+        }
+
+
+
+
+
         [Fact]
         public void TestMessage()
         {
             Message message = new Message();
             Assert.DoesNotThrow(() => message.Timestamp());
-            
+
             string dateValue = null;
             Assert.DoesNotThrow(() => dateValue = message.DateValue);
             Assert.True(!string.IsNullOrEmpty(dateValue));
             Assert.True(this.FindMonth(dateValue));
         }
-                        
+
         bool FindMonth(string dateString)
         {
             for (int i = 0; i < MonthNames.Length; ++i)
@@ -132,7 +162,7 @@ namespace Health.Direct.Common.Tests.Mail
                     return true;
                 }
             }
-            
+
             return false;
         }
     }
