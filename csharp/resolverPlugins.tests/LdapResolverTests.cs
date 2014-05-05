@@ -261,7 +261,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// A valid domain-bound certificate for the Direct address in a DNS CERT Record. Valid address-bound and domain-bound certificates for the Direct address in an LDAP server with associated SRV record.
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts500@direct1.demo.direct-test.com")]
         public void Test500(string subject)
         {
@@ -281,7 +281,7 @@ namespace Health.Direct.ResolverPlugins.Tests
             //
             // Now prove the standard dns resolver will also return the Address Cert.
             //
-            resolver = new Common.Certificates.DnsCertResolver(IPAddress.Parse(Dns_Server));
+            resolver = new DnsCertResolver(IPAddress.Parse(Dns_Server));
             Assert.NotNull(resolver);
 
             certs = resolver.GetCertificates(email);
@@ -303,7 +303,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// An invalid address-bound certificate in a DNS record. Valid address-bound and domain-bound certificates in an LDAP server with associated SRV Record.
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts501@direct1.demo.direct-test.com")]
         public void Test501(string subject)
         {
@@ -342,11 +342,13 @@ namespace Health.Direct.ResolverPlugins.Tests
 
 
         /// <summary>
+        /// Works on both DnsResolver and Modphase3...
+        /// 
         /// Target Certificate: 
         ///A valid address-bound certificate that is larger than 512 bytes in a DNS CERT record for the Direct address.
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts502@direct1.demo.direct-test.com")]
         public void Test502(string subject)
         {
@@ -375,7 +377,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// Expired certificates in DNS CERT address-bound and domain-bound resource records for the Direct address. A valid domain-bound certificate in an LDAP server with associated SRV Record.
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts505@direct2.demo.direct-test.com")]
         public void Test505(string subject)
         {
@@ -394,7 +396,7 @@ namespace Health.Direct.ResolverPlugins.Tests
             AssertCert(certs[0], true);
         }
 
-        
+
 
         /// <summary>
         /// Purpose/ Description:
@@ -405,14 +407,14 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// A valid address-bound certificate in an LDAP server with the appropriate mail attribute and InetOrgPerson Schema. The associated SRV has Priority = 1 and Weight = 0
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts506@direct2.demo.direct-test.com")]
         public void Test506(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
             DirectAgent agent = settings.CreateAgent();
             var email = new MailAddress(subject);
-                 
+
             ICertificateResolver resolver = agent.PublicCertResolver;
             Assert.NotNull(resolver);
 
@@ -425,7 +427,7 @@ namespace Health.Direct.ResolverPlugins.Tests
             AssertCert(certs[0], true);
         }
 
-        
+
 
 
         /// <summary>
@@ -437,7 +439,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// A valid address-bound certificate in an LDAP server with the appropriate mail attribute and InetOrgPerson Schema. The associated SRV Record points to an LDAP instance that is offline and not available. Its Priority = 0 and Weight = 0
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts507@direct3.demo.direct-test.com")]
         public void Test507(string subject)
         {
@@ -487,7 +489,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// Expired certificates in DNS CERT address-bound and domain-bound resource records for a Direct address. An expired address-bound certificate 
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts515@direct2.demo.direct-test.com")]
         public void Test515(string subject)
         {
@@ -521,7 +523,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         }
 
 
-       
+
 
         /// <summary>
         ///  Purpose/Description:
@@ -535,7 +537,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         ///     The associated SRV Record has its Priority = 1 and Weight = 0
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts517@direct3.demo.direct-test.com")]
         public void Test517(string subject)
         {
@@ -567,7 +569,7 @@ namespace Health.Direct.ResolverPlugins.Tests
             Assert.Equal(2, diagnosticsForLdapCertResolver.ActualErrorMessages.Count);
             Assert.Equal("Error=BindFailure\r\n_ldap._tcp.direct3.demo.direct-test.com:389 Priority:0 Weight:0", diagnosticsForLdapCertResolver.ActualErrorMessages[0]);
             // Assert.Equal("Error=BindFailure\r\n_ldap._tcp.direct3.direct-test.com:389 Priority:0 Weight:0", diagnosticsForLdapCertResolver.ActualErrorMessages[1]);
-            
+
             //This is
             Assert.Equal("Error=NoUserCertificateAttribute\r\ndts517@direct3.demo.direct-test.com SRV:_ldap._tcp.direct3.demo.direct-test.com:10389 Priority:1 Weight:0 LDAP:cn=dts517_no_cert,ou=system", diagnosticsForLdapCertResolver.ActualErrorMessages[1]);
 
@@ -600,7 +602,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// Invalid address-bound and domain-bound certificates in CERT records for the Direct address. An SRV record points to the LDAP server and is populated with invalid address-bound and domain-bound certificates for the Direct address and domain.
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts520@direct5.demo.direct-test.com")]
         public void Test520(string subject)
         {
@@ -628,7 +630,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// None
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts511@direct4.demo.direct-test.com")]
         public void Test511(string subject)
         {
@@ -654,7 +656,7 @@ namespace Health.Direct.ResolverPlugins.Tests
         /// Invalid address-bound and domain-bound certificates in DNS CERT records for the Direct address.
         /// </summary>
         /// <param name="subject"></param>
-        [Theory]
+        [Theory(Skip = "Legacy DCDT")]
         [InlineData("dts512@direct6.demo.direct-test.com")]
         public void Test512(string subject)
         {
@@ -669,14 +671,13 @@ namespace Health.Direct.ResolverPlugins.Tests
             AssertCert(certs[0], false);
         }
 
-
         /// <summary>
         /// This test case verifies that your system can query DNS for address-bound CERT records and discover a valid address-bound X.509 certificate for a Direct address.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d1@domain1.demo30.direct-test.com")]
+        [InlineData("d1@domain1.demo.direct-test.com")]
         public void TestD1(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -710,11 +711,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for domain-bound CERT records and discover a valid domain-bound X.509 certificate for a Direct address.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d2@domain1.demo30.direct-test.com")]
+        [InlineData("d2@domain1.demo.direct-test.com")]
         public void TestD2(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -736,11 +737,11 @@ namespace Health.Direct.ResolverPlugins.Tests
             // find invalid cert
             //
             var cert = certs.FindByName("D1_invB");
-            Assert.Equal("domain1.demo30.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
+            Assert.Equal("domain1.demo.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
             AssertCert(cert, false);
 
             cert = certs.FindByName("D2_valB");
-            Assert.Equal("domain1.demo30.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
+            Assert.Equal("domain1.demo.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
             AssertCert(cert, true);
 
 
@@ -749,11 +750,11 @@ namespace Health.Direct.ResolverPlugins.Tests
             //
             certs = resolver.GetCertificatesForDomain(email.Host);
             cert = certs.FindByName("D1_invB");
-            Assert.Equal("domain1.demo30.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
+            Assert.Equal("domain1.demo.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
             AssertCert(cert, false);
 
             cert = certs.FindByName("D2_valB");
-            Assert.Equal("domain1.demo30.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
+            Assert.Equal("domain1.demo.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
             AssertCert(cert, true);
 
         }
@@ -761,11 +762,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for SRV records and discover a valid address-bound X.509 certificate for a Direct address in the associated LDAP server.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d3@domain2.demo30.direct-test.com")]
+        [InlineData("d3@domain2.demo.direct-test.com")]
         public void TestD3(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -785,11 +786,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for SRV records and discover a valid domain-bound X.509 certificate for a Direct address in the associated LDAP server.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d4@domain2.demo30.direct-test.com")]
+        [InlineData("d4@domain2.demo.direct-test.com")]
         public void TestD4(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -811,7 +812,7 @@ namespace Health.Direct.ResolverPlugins.Tests
             X509Certificate2Collection certs = resolver.GetCertificates(email);
 
             var cert = certs.FindByName("D4_valD");
-            Assert.Equal("domain2.demo30.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
+            Assert.Equal("domain2.demo.direct-test.com", cert.GetNameInfo(X509NameType.DnsName, false));
             AssertCert(cert, true);
 
 
@@ -825,11 +826,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for address-bound CERT records and finds, but does not select the associated invalid address-bound X.509 certificate.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d5@domain1.demo30.direct-test.com")]
+        [InlineData("d5@domain1.demo.direct-test.com")]
         public void TestD5(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -850,11 +851,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for domain-bound CERT records and finds, but does not select the associated invalid domain-bound X.509 certificate.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d6@domain4.demo30.direct-test.com")]
+        [InlineData("d6@domain4.demo.direct-test.com")]
         public void TestD6(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -876,11 +877,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// Verify that your system did NOT send an email because it could not find a certificate for the Direct address. To pass this test case, you must NOT receive an email in response.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d7@domain2.demo30.direct-test.com")]
+        [InlineData("d7@domain2.demo.direct-test.com")]
         public void TestD7(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -902,11 +903,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for SRV records and finds, but does not select the invalid domain-bound X.509 certificate in the associated LDAP server.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d8@domain5.demo30.direct-test.com")]
+        [InlineData("d8@domain5.demo.direct-test.com")]
         public void TestD8(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -927,11 +928,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         ///  This test case verifies that your system can query DNS for address-bound CERT records and select the valid address-bound X.509 certificate instead of the invalid address-bound X.509 certificate.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d9@domain1.demo30.direct-test.com")]
+        [InlineData("d9@domain1.demo.direct-test.com")]
         public void TestD9(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -960,11 +961,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for SRV records and attempts to connect to an LDAP server based on the priority value specified in the SRV records until a successful connection is made. Your system should first attempt to connect to an LDAP server associated with an SRV record containing the lowest priority value (highest priority). Since this LDAP server is unavailable, your system should then attempt to connect to the LDAP server associated with an SRV record containing the second lowest priority value (second highest priority) and discover the valid address-bound X.509 certificate in the available LDAP server.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d10@domain3.demo30.direct-test.com")]
+        [InlineData("d10@domain3.demo.direct-test.com")]
         public void TestD10(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -991,17 +992,17 @@ namespace Health.Direct.ResolverPlugins.Tests
             AssertCert(certs[0], true);
 
             Assert.Equal(1, diagnosticsForLdapCertResolver.ActualErrorMessages.Count);
-            Assert.Equal("Error=BindFailure\r\n_ldap._tcp.domain3.demo30.direct-test.com:10389 Priority:0 Weight:0", diagnosticsForLdapCertResolver.ActualErrorMessages[0]);
+            Assert.Equal("Error=BindFailure\r\n_ldap._tcp.domain3.demo.direct-test.com:10389 Priority:0 Weight:0", diagnosticsForLdapCertResolver.ActualErrorMessages[0]);
         }
 
 
         /// <summary>
         /// This test case verifies that your system does not find any certificates when querying DNS for CERT records and does not find any SRV records in DNS.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d11@domain6.demo30.direct-test.com")]
+        [InlineData("d11@domain6.demo.direct-test.com")]
         public void TestD11(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -1018,11 +1019,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for SRV records and attempts to connect to an LDAP server associated with the only SRV record that should be found. Since this LDAP server is unavailable or does not exist and no additional SRV records should have been found, your system should not discover any X.509 certificates in either DNS CERT records or LDAP servers.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d12@domain7.demo30.direct-test.com")]
+        [InlineData("d12@domain7.demo.direct-test.com")]
         public void TestD12(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -1045,16 +1046,16 @@ namespace Health.Direct.ResolverPlugins.Tests
             Assert.Null(certs);
 
             Assert.Equal(1, diagnosticsForLdapCertResolver.ActualErrorMessages.Count);
-            Assert.Equal("Error=BindFailure\r\n_ldap._tcp.domain7.demo30.direct-test.com:10389 Priority:0 Weight:0", diagnosticsForLdapCertResolver.ActualErrorMessages[0]);
+            Assert.Equal("Error=BindFailure\r\n_ldap._tcp.domain7.demo.direct-test.com:10389 Priority:0 Weight:0", diagnosticsForLdapCertResolver.ActualErrorMessages[0]);
         }
 
         /// <summary>
         /// This test case verifies that your system does not discover any certificates in DNS CERT records or LDAP servers when no certificates should be found.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d13@domain8.demo30.direct-test.com")]
+        [InlineData("d13@domain8.demo.direct-test.com")]
         public void TestD13(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -1081,11 +1082,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for address-bound CERT records and discover a valid address-bound X.509 certificate that is larger than 512 bytes using a TCP connection.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d14@domain1.demo30.direct-test.com")]
+        [InlineData("d14@domain1.demo.direct-test.com")]
         public void TestD14(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -1107,11 +1108,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for SRV records and discover a valid address-bound X.509 certificate in the LDAP server associated with an SRV record containing the lowest priority value (highest priority).
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d15@domain2.demo30.direct-test.com")]
+        [InlineData("d15@domain2.demo.direct-test.com")]
         public void TestD15(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
@@ -1144,11 +1145,11 @@ namespace Health.Direct.ResolverPlugins.Tests
 
         /// <summary>
         /// This test case verifies that your system can query DNS for SRV records and discover a valid address-bound X.509 certificate in the LDAP server associated with an SRV record containing the lowest priority value (highest priority) and the highest weight value when SRV records with the same priority value exist.
-        /// /http://demo30.direct-test.com/dcdt-web/discovery
+        /// /http://demo.direct-test.com/dcdt-web/discovery
         /// </summary>
         /// <param name="subject"></param>
         [Theory]
-        [InlineData("d16@domain5.demo30.direct-test.com")]
+        [InlineData("d16@domain5.demo.direct-test.com")]
         public void TestD16(string subject)
         {
             AgentSettings settings = AgentSettings.Load(TestRealResolversXml);
