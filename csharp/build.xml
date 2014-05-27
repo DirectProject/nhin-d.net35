@@ -105,6 +105,11 @@
 		<MSBuild Projects="$(xd_solution)" Targets="Build" Properties="Configuration=$(Configuration)" />
 	</Target>
 
+	<Target Name="test-resolver-plugins" >
+		<xunitproject ProjectFile="unittests\resolverplugins.release.xunit" Condition=" $(Configuration) == 'Release' "/>
+		<xunitproject ProjectFile="unittests\resolverplugins.xunit" Condition=" $(Configuration) == 'Debug' "/>
+	</Target>
+	
 	<!-- information on xUnit can be found at http://xunit.codeplex.com/ it is installed at external\xunit -->
 	<Target Name="test-agent" >
 		<xunitproject ProjectFile="unittests\agent.release.xunit" Condition=" $(Configuration) == 'Release' "/>
