@@ -19,7 +19,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using Health.Direct.Common.DnsResolver;
-using Health.Direct.ResolverPlugins.Tests;
 using Xunit;
 using Xunit.Extensions;
 
@@ -110,7 +109,7 @@ namespace Health.Direct.DnsResponder.Tests
         /// <summary>
         /// https://code.google.com/p/nhin-d/issues/detail?id=240
         /// Demonstration of the correct LINQ query for sorting SRV records 
-        /// DCDT tests exercise actual LDAP queries here <see cref="LdapResolverTests"/>
+        /// DCDT tests exercise actual LDAP queries here <see cref="Health.Direct.SmtpAgent.LdapResolverTests"/>
         /// </summary>
         [Fact]
         public void TestTypeSRVSort()

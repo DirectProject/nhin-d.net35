@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0063CEEB-E7EB-4E87-A0E9-E9962AF74548}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -59,6 +59,8 @@
     <Compile Include="..\..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Fakes\DnsFakeResolver.cs" />
+    <Compile Include="LdapResolverTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SmtpAgentTester.cs" />
     <Compile Include="TestAgentInit.cs" />
@@ -127,6 +129,10 @@
     <ProjectReference Include="..\..\gateway\smtpAgent\smtpAgent.csproj">
       <Project>{A9B11AAD-3461-4DDB-A447-91779BD41A78}</Project>
       <Name>smtpAgent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ResolverPlugin\resolverPlugins.csproj">
+      <Project>{3B166914-A175-4248-B281-EA16AFCFD550}</Project>
+      <Name>resolverPlugins</Name>
     </ProjectReference>
     <ProjectReference Include="..\agent\agent.tests.csproj">
       <Project>{6454E90E-984D-4D09-BD6D-566C9565E028}</Project>

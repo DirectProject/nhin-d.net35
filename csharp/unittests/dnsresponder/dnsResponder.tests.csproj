@@ -87,10 +87,6 @@
       <Project>{A0C03E4C-549D-4868-8B03-DF2C467C1A47}</Project>
       <Name>dnsResponder</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\resolverPlugins.tests\resolverPlugins.tests.csproj">
-      <Project>{2C902B34-80A5-4529-A054-6322C736AEA8}</Project>
-      <Name>resolverPlugins.tests</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
