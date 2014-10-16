@@ -15,9 +15,10 @@ namespace Health.Direct.Admin.Console.Tests.Models
         [InlineData("a@b.com", false)]
         [InlineData("somewhere.com", true)]
         [InlineData("loud.co.uk", true)]
+        [InlineData("_ldap._tcp.joe2.com", true)]
         public void Regex(string domain, bool expected)
         {
-            var regex = new Regex(@"^([A-Za-z0-9\-]{1,63}\.)+[A-Za-z]{2,}$");
+            var regex = new Regex(@"^([A-Za-z0-9\-_]{1,63}\.)+[A-Za-z]{2,}$");
             Assert.Equal(expected, regex.Match(domain).Success);
         }
     }
