@@ -17,6 +17,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
 using Health.Direct.Common.Extensions;
 using Health.Direct.Config.Client.DomainManager;
 using Health.Direct.Config.Store;
@@ -82,6 +83,10 @@ namespace Health.Direct.Config.Console.Command
             = "Add a new NS dns record."
               + Constants.CRLF + DnsRecordParser.ParseCNAMEUsage;
 
+        private const string AddSRVUsage
+            = "Add a new SRV resource dns record."
+              + Constants.CRLF + DnsRecordParser.ParseSRVUsage;
+        
         private const string EnsureCNAMEUsage
             = "Add a new NS dns record if an identical one does not exist."
               + Constants.CRLF + DnsRecordParser.ParseCNAMEUsage;
@@ -96,12 +101,10 @@ namespace Health.Direct.Config.Console.Command
               + Constants.CRLF + "  recordid"
               + Constants.CRLF + "\t recordid: record id to be retrieved from the database";
 
-
         private const string GetSOAUsage
              = "Gets an existing SOA record by ID."
               + Constants.CRLF + "  recordid"
               + Constants.CRLF + "\t recordid: record id to be retrieved from the database";
-
 
         private const string GetANAMEUsage
              = "Gets an existing ANAME record by ID."
@@ -115,6 +118,11 @@ namespace Health.Direct.Config.Console.Command
 
         private const string GetCNAMEUsage
              = "Gets an existing CName record by ID."
+              + Constants.CRLF + "  recordid"
+              + Constants.CRLF + "\t recordid: record id to be retrieved from the database";
+
+        private const string GetSRVUsage
+             = "Gets an existing SRV record by ID."
               + Constants.CRLF + "  recordid"
               + Constants.CRLF + "\t recordid: record id to be retrieved from the database";
               
@@ -323,6 +331,17 @@ namespace Health.Direct.Config.Console.Command
             Client.AddDnsRecord(record);
         }
 
+        /// <summary>
+        /// Add a new NS DnsRecord entry to the db
+        /// </summary>
+        /// <param name="args"></param>
+        [Command(Name = "Dns_SRV_Add", Usage = AddSRVUsage)]
+        public void AddSRV(string[] args)
+        {
+            DnsRecord record = m_parser.ParseSRV(args);
+            Client.AddDnsRecord(record);
+        }
+
         [Command(Name = "Dns_CNAME_Ensure", Usage = EnsureCNAMEUsage)]
         public void EnsureCNAME(string[] args)
         {
@@ -395,7 +414,17 @@ namespace Health.Direct.Config.Console.Command
         {
             this.Get<CNameRecord>(args.GetRequiredValue<long>(0));
         }
-        
+
+        /// <summary>
+        /// Gets an existing SRV DnsRecord entry from the db
+        /// </summary>
+        /// <param name="args"></param>
+        [Command(Name = "Dns_SRV_Get", Usage = GetSRVUsage)]
+        public void GetSRV(string[] args)
+        {
+            this.Get<SRVRecord>(args.GetRequiredValue<long>(0));
+        }
+
         void Get<T>(long recordID)
             where T : DnsResourceRecord
         {
@@ -452,7 +481,14 @@ namespace Health.Direct.Config.Console.Command
         {
             this.Match(args.GetRequiredValue(0), DnsStandard.RecordType.CNAME);
         }
+
+        [Command(Name = "Dns_SRV_Match", Usage = "Resolve SRV records for the given domain")]
+        public void MatchSRV(string[] args)
+        {
+            this.Match(args.GetRequiredValue(0), DnsStandard.RecordType.SRV);
+        }
         
+
         void Match(string domain, DnsStandard.RecordType type)
         {
             DnsRecord[] records = this.GetRecords(domain, type);
@@ -595,7 +631,17 @@ namespace Health.Direct.Config.Console.Command
               + Constants.CRLF + "\t cname: alias for this domain"
               + Constants.CRLF + "\t [ttl]: time to live in seconds"
               + Constants.CRLF + "\t [notes]: description for the record";
-        
+
+        public const string ParseSRVUsage =
+              "  domainname weight port target [priority] [ttl] [notes]"
+              + Constants.CRLF + "\t domainname: The domain this RR refers to. RFC2782"
+              + Constants.CRLF + "\t weight: A server selection mechanism. RFC2782"
+              + Constants.CRLF + "\t port: The port on this target host of this service. RFC2782"
+              + Constants.CRLF + "\t target: The domain name of the target host. RFC2782"
+              + Constants.CRLF + "\t [priority]: The priority of this target host. RFC2782"
+              + Constants.CRLF + "\t [ttl]: time to live in seconds, 32bit int"
+              + Constants.CRLF + "\t [notes]: description for the record";
+
         #endregion
                 
         public DnsRecordParser()
@@ -687,6 +733,21 @@ namespace Health.Direct.Config.Console.Command
 
             CNameRecord cnameRecord = new CNameRecord(domainName, cname) {TTL = ttl};
             DnsRecord dnsRecord = new DnsRecord(domainName, DnsStandard.RecordType.CNAME, cnameRecord.Serialize(), notes);
+            return dnsRecord;
+        }
+
+        public DnsRecord ParseSRV(string[] args)
+        {
+            string domainName = args.GetRequiredValue(0);
+            ushort weight = args.GetRequiredValue<ushort>(1);
+            ushort port = args.GetRequiredValue<ushort>(2);
+            string target = args.GetRequiredValue(3); //target
+            ushort priority = args.GetOptionalValue<ushort>(4, 0);
+            int ttl = this.ValidateTTL(args.GetOptionalValue<int>(5, 0));
+            string notes = args.GetOptionalValue(6, string.Empty);
+
+            SRVRecord srvRecord = new SRVRecord(domainName, weight, port, target, priority) { TTL = ttl };
+            DnsRecord dnsRecord = new DnsRecord(domainName, DnsStandard.RecordType.SRV, srvRecord.Serialize(), notes);
             return dnsRecord;
         }
                 

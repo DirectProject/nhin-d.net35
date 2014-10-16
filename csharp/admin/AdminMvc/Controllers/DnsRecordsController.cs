@@ -67,6 +67,19 @@ namespace Health.Direct.Admin.Console.Controllers
             return Add<SoaRecordModel>();
         }
 
+        [Authorize]
+        public ActionResult AddSrv()
+        {
+            return View(new SrvRecordModel());
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult AddSrv(FormCollection formValues)
+        {
+            return Add<SrvRecordModel>();
+        }
+
         private ActionResult Add<T>()
             where T : DnsRecordModel, new()
         {
@@ -100,6 +113,12 @@ namespace Health.Direct.Admin.Console.Controllers
 			return Details<SoaRecordModel>(id);
 		}
 
+        [Authorize]
+        public ActionResult SrvDetails(long id)
+        {
+            return Details<SrvRecordModel>(id);
+        }
+
 		private ActionResult Details<T>(long id)
 			where T : DnsRecordModel, new()
 		{
@@ -128,6 +147,12 @@ namespace Health.Direct.Admin.Console.Controllers
 		{
 			return Edit<SoaRecordModel>(id);
 		}
+
+        [Authorize]
+        public ActionResult EditSrv(long id)
+        {
+            return Edit<SrvRecordModel>(id);
+        }
 
 		private ActionResult Edit<T>(long id)
 			where T : DnsRecordModel, new()
@@ -160,6 +185,13 @@ namespace Health.Direct.Admin.Console.Controllers
 		{
 			return Edit<SoaRecordModel>(formValues);
 		}
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult EditSrv(FormCollection formValues)
+        {
+            return Edit<SrvRecordModel>(formValues);
+        }
 
 		private ActionResult Edit<T>(FormCollection formValues)
 			where T : DnsRecordModel, new()

@@ -106,7 +106,10 @@ namespace Health.Direct.DnsResponder
                     break;
                 case DnsStandard.RecordType.CNAME:
                     ProcessCNAMEQuestion(response);
-                    break;                    
+                    break;
+                case DnsStandard.RecordType.SRV:
+                    ProcessSRVQuestion(response);
+                    break;      
             }
             
             return response;
@@ -222,6 +225,19 @@ namespace Health.Direct.DnsResponder
             using (RecordRetrievalServiceClient client = m_recordRetrievalServiceSettings.CreateRecordRetrievalClient())
             {
                 client.GetCNAMERecords(response.Question.Domain, response.AnswerRecords);
+            }
+        }
+
+        /// <summary>
+        /// processes a SRV Question, populated the response with any matching results pulled from the database store
+        /// </summary>
+        /// <param name="response">DnsResponse instance containing information about the question that will
+        /// have any corresponding answer records populated upon return</param>
+        protected void ProcessSRVQuestion(DnsResponse response)
+        {
+            using (RecordRetrievalServiceClient client = m_recordRetrievalServiceSettings.CreateRecordRetrievalClient())
+            {
+                client.GetSRVRecords(response.Question.Domain, response.AnswerRecords);
             }
         }
     }

@@ -52,6 +52,11 @@ namespace Health.Direct.Config.Client
             client.GetMatches(domain, recordCollection, DnsStandard.RecordType.NS);
         }
 
+        public static void GetSRVRecords(this RecordRetrievalServiceClient client, string domain, DnsResourceRecordCollection recordCollection)
+        {
+            client.GetMatches(domain, recordCollection, DnsStandard.RecordType.SRV);
+        }
+
         public static void GetMatches(this RecordRetrievalServiceClient client, string domain, DnsResourceRecordCollection resourceRecords, DnsStandard.RecordType recordType)
         {
             DnsRecord[] matches = client.GetMatchingDnsRecords(domain, recordType);

@@ -138,6 +138,7 @@
     <Compile Include="Models\Repositories\IRepository.cs" />
     <Compile Include="Models\Repositories\RepositoryModule.cs" />
     <Compile Include="Models\SoaRecordModel.cs" />
+    <Compile Include="Models\SrvRecordModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\HtmlHelperExtensions.cs" />
   </ItemGroup>
@@ -211,7 +212,10 @@
     <Content Include="Views\DnsRecords\AddMx.aspx" />
     <Content Include="Views\DnsRecords\AddAname.aspx" />
     <Content Include="Views\DnsRecords\AddSoa.aspx" />
+    <Content Include="Views\DnsRecords\AddSRV.aspx" />
     <Content Include="Views\DnsRecords\AnameDetails.ascx" />
+    <Content Include="Views\DnsRecords\SrvDetails.ascx" />
+    <Content Include="Views\DnsRecords\EditSrv.aspx" />
     <Content Include="Views\DnsRecords\DnsRecordDetailsDialog.ascx" />
     <Content Include="Views\DnsRecords\EditAname.aspx" />
     <Content Include="Views\DnsRecords\EditMx.aspx" />
