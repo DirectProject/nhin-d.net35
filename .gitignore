@@ -31,8 +31,11 @@ java/gateway/OutgoingMsgFolder/
 java/gateway/RawMsgFolder/
 java/xd-common/war
 java/gateway/war
+java/dns/war
 java/install/build
 java/config/config-service/src/main/webapp/WEB-INF/beans.xml
+*.war
+*.dat
 
 nhindconfig/service.properties
 config-service-client/war/config-service.war
@@ -50,7 +53,7 @@ log1.dat
 logmirror.ctrl
 seg0/*
 
-# Ignore Visual Studio 2008 files
+# Ignore Visual Studio files
 *.obj
 *.exe
 *.pdb
@@ -118,5 +121,5 @@ csharp/installer/DirectConfig.sql
 csharp/installer/*.zip
 tools/trust.bundler/cmdlet/Examples/*.p7*
 tools/trust.bundler/build/packages/**
-csharp/build/Backup*
-csharp/build/Upgrade*
+csharp/build/packages/**
+*.DotSettings
